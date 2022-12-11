@@ -1,7 +1,7 @@
 mod url_shortener;
-use actix_files::NamedFile;
-use actix_web::{web::{self}, App, HttpServer, HttpResponse, post, get, HttpRequest};
-use std::{sync::RwLock, path::PathBuf};
+use actix_files::{NamedFile, Files};
+use actix_web::{web::{self}, App, HttpServer, HttpResponse, post, get};
+use std::{sync::RwLock};
 use serde::{Deserialize};
 use url_shortener::UrlShortener;
 
@@ -18,14 +18,6 @@ struct Info {
 async fn index() -> actix_web::Result<NamedFile> {
     Ok(NamedFile::open("./assets/index.html")?)
 }
-
-#[get("/assets/{filename:.*}")]
-async fn resource(req: HttpRequest) -> actix_web::Result<NamedFile> {
-    let path: PathBuf = (String::from("./assets/") + req.match_info().query("filename")).parse().unwrap();
-    Ok(NamedFile::open(path)?)
-}
-
-
 
 #[post("/s")]
 async fn shorten(data: web::Data<AppState>, form: web::Form<Info>) -> HttpResponse {
@@ -56,7 +48,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .service(index)
-            .service(resource)
+            .service(Files::new("/assets", "./assets").show_files_listing())
             .app_data(urlsh.clone())
             .service(shorten)
             .service(resolve)
