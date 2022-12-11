@@ -1,0 +1,66 @@
+/*!
+ * Retro Pages v0.0.1
+ * Copyright 2022 rcv4
+ * Licensed under MIT
+*/
+
+:root {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: white;
+}
+
+body {
+    margin: 32px 0;
+    display: flex;
+    justify-content: center;
+    
+}
+
+p {
+    margin: 0px;
+}
+
+h3 {
+    font-size: medium;
+    font-weight: bolder;
+}
+
+.rp-page {
+    width: fit-content;
+    background-color: white;
+
+    border: 1.5px solid;
+    box-shadow: 10px 10px darkgray;
+}
+
+.rp-head {
+    border-bottom: 1px solid;
+    padding: 3px;
+}
+
+.rp-head p {
+    font-size: smaller;
+}
+
+.rp-body {
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+
+    margin-right: 50px;
+    margin-bottom: 12px;
+}
+
+input[type=submit] {
+    color: white;
+    background-color: black;
+    box-shadow: 5px 5px darkgray;
+    border: none;
+    font-weight: bold;
+    padding: 2px 8px;
+    float: right;
+    margin: 10px;
+    margin-right: 0px;
+
+    font-family : inherit;
+}
