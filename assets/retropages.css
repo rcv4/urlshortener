@@ -62,5 +62,7 @@ input[type=submit] {
     margin: 10px;
     margin-right: 0px;
 
+    border-radius: 0px;
+
     font-family : inherit;
 }
