@@ -1,6 +1,10 @@
 mod url_shortener;
+mod model;
 use actix_files::{NamedFile, Files};
 use actix_web::{web::{self}, App, HttpServer, HttpResponse, post, get};
+use model::ShortenedUrl;
+use r2d2_sqlite::SqliteConnectionManager;
+use sea_query::{SqliteQueryBuilder, Table, ColumnDef};
 use std::{sync::RwLock};
 use serde::{Deserialize};
 use url_shortener::UrlShortener;
@@ -41,8 +45,37 @@ async fn resolve(data: web::Data<AppState>, info: web::Path<String>) -> HttpResp
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let manager = SqliteConnectionManager::file("file.db");
+    let pool = r2d2::Pool::new(manager).unwrap();
+    let sql = [
+        Table::create()
+            .if_not_exists()
+            .table(ShortenedUrl::Table)
+            .col(
+                ColumnDef::new(ShortenedUrl::Code)
+                    .auto_increment()
+                    .primary_key()
+                    .integer()
+            )
+            .col(
+                ColumnDef::new(ShortenedUrl::Url)
+                    .string()
+                    .not_null()
+            )
+            .build(SqliteQueryBuilder),
+        ].join("; ");
+    println!("{}", &sql);
+
+    match pool.get().unwrap().execute_batch(&sql) {
+        Ok(_) => println!("Checked Schema"),
+        Err(e) => panic!("Failed to check schema {:?}", e)
+    }
+
+    
+
     let urlsh = web::Data::new(AppState {
-        url_sh: RwLock::new(UrlShortener::new())
+        url_sh: RwLock::new(UrlShortener::new(pool))
     });
 
     HttpServer::new(move || {
