@@ -5,7 +5,7 @@ use actix_web::{web::{self}, App, HttpServer, HttpResponse, post, get};
 use model::ShortenedUrl;
 use r2d2_sqlite::SqliteConnectionManager;
 use sea_query::{SqliteQueryBuilder, Table, ColumnDef};
-use std::{sync::RwLock, fmt::format};
+use std::{sync::RwLock};
 use serde::{Deserialize};
 use url_shortener::UrlShortener;
 
