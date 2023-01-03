@@ -1238,6 +1238,7 @@ dependencies = [
  "sea-query",
  "sea-query-rusqlite",
  "serde",
+ "url",
 ]
 
 [[package]]

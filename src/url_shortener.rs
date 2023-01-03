@@ -2,6 +2,7 @@ use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use sea_query::{Query, SqliteQueryBuilder, Expr};
 use sea_query_rusqlite::RusqliteBinder;
+use url::Url;
 
 
 use crate::model::{ShortenedUrl, ShortenedUrlStruct};
@@ -14,7 +15,12 @@ impl UrlShortener {
         UrlShortener { pool: db_pool }
     }
 
-    pub fn shorten(&mut self, origin: &str) -> String{
+    pub fn shorten(&mut self, origin: &str) -> Result<String, String>{
+        if Url::parse(origin).is_err() {
+            return Err("Invalid URL".to_string())
+        }
+
+
         let (query, values) = Query::insert()
             .into_table(ShortenedUrl::Table)
             .columns([
@@ -32,7 +38,7 @@ impl UrlShortener {
             Err(_) => println!("error")
         }
 
-        con.last_insert_rowid().to_string()
+        Ok(con.last_insert_rowid().to_string())
     }
 
     pub fn resolve(&self, code: &str) -> Option<String>{

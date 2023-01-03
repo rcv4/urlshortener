@@ -5,7 +5,7 @@ use actix_web::{web::{self}, App, HttpServer, HttpResponse, post, get};
 use model::ShortenedUrl;
 use r2d2_sqlite::SqliteConnectionManager;
 use sea_query::{SqliteQueryBuilder, Table, ColumnDef};
-use std::{sync::RwLock};
+use std::{sync::RwLock, fmt::format};
 use serde::{Deserialize};
 use url_shortener::UrlShortener;
 
@@ -24,10 +24,12 @@ async fn index() -> actix_web::Result<NamedFile> {
 }
 
 #[post("/s")]
-async fn shorten(data: web::Data<AppState>, form: web::Form<Info>) -> HttpResponse {
+async fn shorten(data: web::Data<AppState>, form: web::Form<Info>, req: actix_web::HttpRequest) -> HttpResponse {
     let mut urlsh = data.url_sh.write().unwrap();
-
-    HttpResponse::Ok().insert_header(("Content-type", "text/plain")).body(String::from("127.0.0.1/r/") + &urlsh.shorten(&form.url))
+    match &urlsh.shorten(&form.url){
+        Ok(code) => HttpResponse::Ok().insert_header(("Content-type", "text/plain")).body(format!("{}/r/{}", req.app_config().host(), code)),
+        Err(error) => HttpResponse::BadRequest().body(error.to_string())
+    }
 }
 #[get("/r/{id}")]
 async fn resolve(data: web::Data<AppState>, info: web::Path<String>) -> HttpResponse {
